@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projects Overview</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#121a33; --muted:#7f8db2; --text:#e9eefc; --accent:#6aa6ff; --accent-2:#a0e9ff; --ok:#27c093; --chip:#233057;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; background:linear-gradient(180deg, #0b1020 0%, #101937 100%); color:var(--text)}
+    .container{max-width:1100px; margin:40px auto; padding:0 20px}
+    header{display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:20px}
+    .title{font-size:clamp(22px, 3vw, 34px); font-weight:800; letter-spacing:0.2px}
+    .subtitle{color:var(--muted)}
+    .toolbar{display:flex; gap:10px; flex-wrap:wrap}
+    .search{display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid #2a3a6b; border-radius:12px; background:rgba(255,255,255,0.03)}
+    .search input{all:unset; color:var(--text); width:220px}
+    .chip{font-size:12px; padding:6px 10px; border-radius:999px; background:var(--chip); color:#c7d6ff; border:1px solid #2a3a6b}
+    .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:18px}
+    @media (max-width:900px){.grid{grid-template-columns:repeat(6,1fr)}}
+    @media (max-width:600px){.grid{grid-template-columns:repeat(1,1fr)}}
+    .card{grid-column:span 4; background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border:1px solid #25345f; border-radius:18px; padding:18px; position:relative; overflow:hidden; box-shadow:0 10px 24px rgba(4,8,28,0.4)}
+    .card:hover{border-color:#3c5aa5; box-shadow:0 14px 36px rgba(20,40,100,0.5)}
+    .card .name{font-weight:700; font-size:18px}
+    .desc{color:#cdd8ff; opacity:0.9; margin:6px 0 10px}
+    .meta{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .badge{font-size:12px; padding:4px 8px; border-radius:10px; border:1px solid #2a3a6b; background:rgba(255,255,255,0.04)}
+    .status{color:#0dffd0; border-color:#0dffd03d; background:rgba(13,255,208,0.08)}
+    .date{color:#b9c7ff}
+    .tags{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+    .tag{font-size:11px; padding:5px 8px; border-radius:8px; background:#162348; color:#b9c7ff; border:1px solid #263a71}
+    .actions{display:flex; gap:10px; margin-top:14px}
+    .btn{appearance:none; border:1px solid #35549a; background:linear-gradient(180deg,#203261,#1a2952); color:#eaf0ff; padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:600}
+    .btn:hover{border-color:#5f8cff; transform:translateY(-1px)}
+    .btn.secondary{background:transparent; color:#cfe0ff}
+    .empty{grid-column:1/-1; opacity:0.7; text-align:center; padding:30px; border:1px dashed #2a3a6b; border-radius:18px}
+    footer{margin-top:28px; color:var(--muted); font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="title">Projects</div>
+        <div class="subtitle">A quick overview of current tools & experiments</div>
+      </div>
+      <div class="toolbar">
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35" stroke="#a9b9ee" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#a9b9ee" stroke-width="2"/></svg>
+          <input id="q" placeholder="Search projects..." />
+        </div>
+        <span class="chip" id="count">1 project</span>
+      </div>
+    </header>
+
+    <section class="grid" id="grid">
+      <!-- Single project card -->
+      <article class="card" data-name="wikipedia literature checker" data-tags="wikipedia, isbn, checker, literature, dnb">
+        <div class="name">Wikipedia Literature Checker</div>
+        <div class="desc">Scan German Wikipedia articles for literature sections, surface missing ISBNs, detect formatting issues (title/ISBN checks), and optionally query DNB (via proxy) for hyphenated ISBNs.</div>
+        <div class="meta">
+          <span class="badge status">Status: Active</span>
+          <span class="badge date">Updated: <span id="updated"></span></span>
+        </div>
+        <div class="tags">
+          <span class="tag">JavaScript</span>
+          <span class="tag">Wikipedia API</span>
+          <span class="tag">DNB SRU</span>
+          <span class="tag">Regex</span>
+        </div>
+        <div class="actions">
+          <a class="btn" href="#" id="openDemo">Open</a>
+          <a class="btn secondary" href="#" id="openRepo">Repository</a>
+        </div>
+      </article>
+
+      <!-- Placeholder when you add more items later -->
+      <div class="empty" id="emptyState" style="display:none">No projects match your search.</div>
+    </section>
+
+    <footer>
+      Tip: Click <b>Open</b> to link your local HTML demo, or replace the button href with your hosted URL.
+    </footer>
+  </div>
+
+  <script>
+    // Fill in a friendly last-updated date (today)
+    (function(){
+      const el = document.getElementById('updated');
+      const d = new Date();
+      const fmt = d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'2-digit'});
+      el.textContent = fmt;
+    })();
+
+    // Wire up search filter
+    (function(){
+      const q = document.getElementById('q');
+      const grid = document.getElementById('grid');
+      const cards = Array.from(grid.querySelectorAll('.card'));
+      const empty = document.getElementById('emptyState');
+      const count = document.getElementById('count');
+
+      function apply(){
+        const term = q.value.trim().toLowerCase();
+        let visible = 0;
+        cards.forEach(card=>{
+          const name = card.dataset.name || '';
+          const tags = card.dataset.tags || '';
+          const hit = !term || name.includes(term) || tags.includes(term);
+          card.style.display = hit ? '' : 'none';
+          if (hit) visible++;
+        });
+        empty.style.display = visible ? 'none' : '';
+        count.textContent = visible + (visible===1 ? ' project' : ' projects');
+      }
+      q.addEventListener('input', apply);
+      apply();
+    })();
+
+    // TODO: Replace these with your actual links
+    document.getElementById('openDemo').href = '#'; // e.g. './wikipedia-literature-checker.html'
+    document.getElementById('openRepo').href = '#'; // e.g. 'https://github.com/you/wikipedia-literature-checker'
+  </script>
+</body>
+</html>
